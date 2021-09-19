@@ -3,7 +3,6 @@ import zqd
 import praw
 import subprocess
 import requests
-import pprint
 import uuid
 import json
 
@@ -39,55 +38,12 @@ submissions = reddit.subreddit("all").hot(limit=1)
 
 # load them and their comment trees into Zed
 for submission in submissions:
-    # unpack submission object into a JSON-serializable dictionary
-    # submission_dict = {"id": submission.id
-    #                 , "title": submission.title
-    #                 , "score": submission.score
-    #                 , "url": submission.url
-    #                 , "subreddit": submission.subreddit.display_name
-    #                 , "author": submission.author.name
-    #                 , "upvote_ratio": submission.upvote_ratio
-    #                 , "score": submission.score
-    #                 , "ups": submission.ups
-    #                 , "link_flair_css_class": submission.link_flair_css_class
-    #                 , "pwls": submission.pwls
-    #                 , "downs": submission.downs
-    #                 , "quarantine": submission.quarantine
-    #                 , "upvote_ratio": submission.upvote_ratio
-    #                 , "total_awards_received": submission.total_awards_received
-    #                 , "created": submission.created
-    #                 , "score": submission.score
-    #                 , "subreddit_subscribes": submission.subreddit_subscribers
-    #                 , "url": submission.url
-    #                 }
+    submission_data = json.dumps(vars(submission), default=lambda o: "")
+    req_out = requests.post(pool_url, data=submission_data)
+    print(req_out)
 
-    submission_dict = vars(submission)
-
-    # submission_dict is now a string of a dictionary
-    submission_dict = str(submission_dict)
-
-    # submission_dict is now json
-    submission_dict = json.dumps(submission_dict)
-    print(submission_dict)
-
-    req_out = requests.post(pool_url, json=submission_dict)
-    pprint.pprint(req_out)
-    pprint.pprint(req_out.json())
-
-    # add in comment ingestion code later... requires schema curation...
-    # submission.comments.replace_more(limit=None)
-    # for comment in submission.comments.list():
-    #     print("====== COMMENTS =======")
-    #     print(comment.body)
-    #     comment_dict = str(vars(comment))
-    #     json_comment = json.dumps(comment_dict)
-    #     req_out = requests.post(pool_url, json=json_comment)
-    #     print(req_out)
-
-
-
-
-
-# NOTE: there may be a way around the JSON serialization issues.
-# Either it can be handled by Zed, or it can be handled by the user.
-# default = lambda o: f"<<non-serializable: {type(o).__qualname__}>>"
+    submission.comments.replace_more(limit=None)
+    for comment in submission.comments.list():
+        comment_data = json.dumps(vars(comment), default=lambda o: "")
+        req_out = requests.post(pool_url, data=comment_data)
+        print(req_out)
