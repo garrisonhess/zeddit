@@ -1,0 +1,12 @@
+# Part 1: Reddit -> Zed
+# Part 2: Zed -> Scikit-learn Model Training
+# Part 3: Scikit-learn Model Inference -> Zed
+# Part 4: Zed -> Result Querying and Visualization
+# This can loop without losing any data since Zed provides persistence.
+# Zed's schema flexibility will allow me to develop without stopping to curate schemas.
+
+# Now that we have some stuff in a zpool, load it and run some models!
+# This data will continue to grow as we ingest more reddit posts.
+# We can run text models on the data, and persist the data in another zpool.
+# Then we can query results from the zpool, and visualize them.
+
