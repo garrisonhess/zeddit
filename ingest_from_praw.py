@@ -34,16 +34,25 @@ print(f"Pool ID: {pool_id}")
 print(f"Pool URL: {pool_url}")
 
 # get some submissions
-submissions = reddit.subreddit("all").hot(limit=1)
+submissions = reddit.subreddit("all").hot(limit=100)
+total_comments = 0
 
 # load them and their comment trees into Zed
-for submission in submissions:
+for sub_idx, submission in enumerate(submissions):
     submission_data = json.dumps(vars(submission), default=lambda o: "")
     req_out = requests.post(pool_url, data=submission_data)
-    print(req_out)
+
+    if req_out.status_code != requests.codes.ok:
+        print(req_out)
+        print(req_out.json())
 
     submission.comments.replace_more(limit=None)
-    for comment in submission.comments.list():
+    for comm_idx, comment in enumerate(submission.comments.list()):
+        total_comments += 1
         comment_data = json.dumps(vars(comment), default=lambda o: "")
         req_out = requests.post(pool_url, data=comment_data)
-        print(req_out)
+        print(f"submission index: {sub_idx}, comment index: {comm_idx}, total_comments: {total_comments}")
+
+        if req_out.status_code != requests.codes.ok:
+            print(req_out)
+            print(req_out.json())
