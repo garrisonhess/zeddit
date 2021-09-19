@@ -35,34 +35,44 @@ print(f"Pool ID: {pool_id}")
 print(f"Pool URL: {pool_url}")
 
 # get some submissions
-submissions = reddit.subreddit("all").hot(limit=100)
+submissions = reddit.subreddit("all").hot(limit=1)
 
 # load them and their comment trees into Zed
 for submission in submissions:
     # unpack submission object into a JSON-serializable dictionary
-    submission_dict = {"id": submission.id
-                    , "title": submission.title
-                    , "score": submission.score
-                    , "url": submission.url
-                    , "subreddit": submission.subreddit.display_name
-                    , "author": submission.author.name
-                    , "upvote_ratio": submission.upvote_ratio
-                    , "score": submission.score
-                    , "ups": submission.ups
-                    , "link_flair_css_class": submission.link_flair_css_class
-                    , "pwls": submission.pwls
-                    , "downs": submission.downs
-                    , "quarantine": submission.quarantine
-                    , "upvote_ratio": submission.upvote_ratio
-                    , "total_awards_received": submission.total_awards_received
-                    , "created": submission.created
-                    , "score": submission.score
-                    , "subreddit_subscribes": submission.subreddit_subscribers
-                    , "url": submission.url
-                    }
+    # submission_dict = {"id": submission.id
+    #                 , "title": submission.title
+    #                 , "score": submission.score
+    #                 , "url": submission.url
+    #                 , "subreddit": submission.subreddit.display_name
+    #                 , "author": submission.author.name
+    #                 , "upvote_ratio": submission.upvote_ratio
+    #                 , "score": submission.score
+    #                 , "ups": submission.ups
+    #                 , "link_flair_css_class": submission.link_flair_css_class
+    #                 , "pwls": submission.pwls
+    #                 , "downs": submission.downs
+    #                 , "quarantine": submission.quarantine
+    #                 , "upvote_ratio": submission.upvote_ratio
+    #                 , "total_awards_received": submission.total_awards_received
+    #                 , "created": submission.created
+    #                 , "score": submission.score
+    #                 , "subreddit_subscribes": submission.subreddit_subscribers
+    #                 , "url": submission.url
+    #                 }
+
+    submission_dict = vars(submission)
+
+    # submission_dict is now a string of a dictionary
+    submission_dict = str(submission_dict)
+
+    # submission_dict is now json
+    submission_dict = json.dumps(submission_dict)
+    print(submission_dict)
 
     req_out = requests.post(pool_url, json=submission_dict)
     pprint.pprint(req_out)
+    pprint.pprint(req_out.json())
 
     # add in comment ingestion code later... requires schema curation...
     # submission.comments.replace_more(limit=None)
